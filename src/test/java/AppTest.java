@@ -1,6 +1,5 @@
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.UUID;
-import cn.hutool.extra.ssh.JschUtil;
 import com.braisefish.jrst.lang.JrstCommonException;
 import com.braisefish.jrst.utils.BuildHelper;
 import com.braisefish.jrst.utils.JsonUtils;
@@ -88,7 +87,7 @@ public class AppTest {
 
 
     @Test
-    public void threadTest() throws IOException, JrstCommonException, InterruptedException {
+    public void threadTest() {
         BuildHelper.ofExecGet(new JrstThread(isStop -> {
             while (!isStop.get()) {
                 try {
@@ -114,15 +113,15 @@ public class AppTest {
     }
 
     @Test
-    public void jschTest() throws IOException, JrstCommonException {
+    public void jschTest() {
 
     }
 
     @Test
     public void verifyCodeTest() throws JrstCommonException, JsonProcessingException {
         VerifyCodeUtil.registerClearExpireVerifyCodeTimer();
-        VerifyCodeInput verifyCodeInput = null;
-        VerifyCodeOutput verifyCodeOutput = null;
+        VerifyCodeInput verifyCodeInput;
+        VerifyCodeOutput verifyCodeOutput;
         for (int i = 0; i < 10; i++) {
             verifyCodeInput = new VerifyCodeInput();
             verifyCodeInput.setVerifyCodeKey(UUID.randomUUID().toString(true));

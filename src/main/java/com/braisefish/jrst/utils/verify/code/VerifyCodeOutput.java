@@ -3,6 +3,9 @@ package com.braisefish.jrst.utils.verify.code;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * @author 32365
+ */
 public class VerifyCodeOutput {
     public VerifyCodeOutput(String uid, String base64){
         this.uid = uid;

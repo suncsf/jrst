@@ -12,6 +12,9 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * @author sunchao
+ */
 public class VerifyCodeUtil {
     private final static Logger log = LoggerFactory.getLogger(VerifyCodeUtil.class);
     /**
@@ -42,7 +45,7 @@ public class VerifyCodeUtil {
         }
     }
 
-    public static VerifyCodeOutput createVerifyCode(VerifyCodeInput verifyCodeInput) throws JrstCommonException {
+    public static VerifyCodeOutput createVerifyCode(VerifyCodeInput verifyCodeInput) {
         if(StrUtil.isNotBlank(verifyCodeInput.getVerifyCodeKey())){
             VERIFY_CODE_PROPERTY.remove(verifyCodeInput.getVerifyCodeKey());
         }
@@ -80,10 +83,10 @@ public class VerifyCodeUtil {
     }
 
     private static class VerifyCodeCache {
-        private String key;
-        private String value;
-        private Date createTime;
-        private Integer expireMillisecond;
+        private final String key;
+        private final String value;
+        private final Date createTime;
+        private final Integer expireMillisecond;
         public VerifyCodeCache(String key, String value, int expireMillisecond) {
             this.key = key;
             this.value = value;
@@ -92,16 +95,16 @@ public class VerifyCodeUtil {
         }
         /**
          * 是否过期
-         * @return
+         * @return true:过期 false:未过期
          */
         public boolean isExpire(){
             return DateUtil.between(createTime,new Date(), DateUnit.MS) > expireMillisecond;
         }
         /**
          * 验证码是否正确
-         * @param verifyCodeKey
-         * @param code
-         * @return
+         * @param verifyCodeKey 验证码key
+         * @param code 验证码
+         * @return true:正确 false:错误
          */
         public boolean equals(String verifyCodeKey,String code) {
             return Objects.equals(key,verifyCodeKey) && Objects.equals(value,code);

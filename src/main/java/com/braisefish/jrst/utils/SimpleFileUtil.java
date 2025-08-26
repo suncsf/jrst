@@ -5,7 +5,8 @@ import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 import com.braisefish.jrst.lang.JrstCommonException;
-import com.braisefish.jrst.lang.JwtAuthorazationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.*;
@@ -14,39 +15,64 @@ import java.util.Objects;
 
 /**
  * @author sunchao
- * @date 2025/08/25 11:05:00
  */
 public class SimpleFileUtil {
+    private static final Logger log = LoggerFactory.getLogger(SimpleFileUtil.class);
+    /**
+     * Base directory
+     */
     private static String baseDir;
+    /**
+     * Builder
+     */
     private Builder builder;
-    private String basePath;
+
+    private String userDir;
     private String relativeDirPath;
     private String relativeFilePath;
     private String physicsDirPath;
     private String physicsFilePath;
 
+    /**
+     * Get physics file path
+     */
     public String getPhysicsFilePath() {
         return physicsFilePath;
     }
 
+    /**
+     * Get physics directory path
+     */
     public String getPhysicsDirPath() {
         return physicsDirPath;
     }
 
+    /**
+     * Get relative file path
+     */
     public String getRelativeFilePath() {
         return relativeFilePath;
     }
 
+    /**
+     * Get relative directory path
+     */
     public String getRelativeDirPath() {
         return relativeDirPath;
     }
 
-    public String getBasePath() {
-        return basePath;
+    /**
+     * Get user directory
+     */
+    public String getUserDir() {
+        return userDir;
     }
 
+    /**
+     * Register base directory
+     */
     public static void registerBaseDir(String baseDir) throws IOException, JrstCommonException {
-        if(StrUtil.isNotBlank(SimpleFileUtil.baseDir)){
+        if (StrUtil.isNotBlank(SimpleFileUtil.baseDir)) {
             throw new JrstCommonException("已存在baseDir");
         }
         if (StrUtil.isBlank(baseDir)) {
@@ -55,6 +81,9 @@ public class SimpleFileUtil {
         SimpleFileUtil.baseDir = File.separator + baseDir;
     }
 
+    /**
+     * Get base directory
+     */
     public static String getBaseDir() {
         if (StrUtil.isBlank(baseDir)) {
             return File.separator + "default_dir";
@@ -62,20 +91,28 @@ public class SimpleFileUtil {
         return baseDir;
     }
 
+    /**
+     * Get base physics directory
+     */
     public static String getBasePhysicsDir() {
         return System.getProperty("user.dir") + getBaseDir();
     }
 
 
-
+    /**
+     * Builder
+     */
     private SimpleFileUtil() {
     }
 
+    /**
+     * Builder
+     */
     public SimpleFileUtil(Builder builder) throws IOException {
         this.builder = builder;
-        this.basePath = System.getProperty("user.dir");
+        this.userDir = System.getProperty("user.dir");
         this.relativeDirPath = getBaseDir() + builder.getDir();
-        this.physicsDirPath = this.basePath + this.relativeDirPath;
+        this.physicsDirPath = this.userDir + this.relativeDirPath;
         if (builder.getCreateDir()) {
             var dir = new File(this.physicsDirPath);
             if (!dir.exists()) {
@@ -94,118 +131,213 @@ public class SimpleFileUtil {
         }
     }
 
+    /**
+     * Get file name
+     *
+     * @return File name
+     */
     public String getFileName() {
         return builder.getFileName();
     }
 
+    /**
+     * Get file extension
+     *
+     * @return File extension
+     */
     public String getExt() {
         return builder.getExt();
     }
 
+    /**
+     * Write string
+     *
+     * @param content String
+     */
     public void writeString(String content) {
         FileUtil.writeString(content, this.physicsFilePath, CharsetUtil.UTF_8);
     }
 
+    /**
+     * Write from stream
+     *
+     * @param inputStream Input stream
+     */
     public void writeFromStream(InputStream inputStream) {
         FileUtil.writeFromStream(inputStream, this.physicsFilePath);
     }
 
+    /**
+     * Get input stream
+     *
+     * @return Input stream
+     */
     public BufferedInputStream getInputStream() {
         return FileUtil.getInputStream(this.physicsFilePath);
     }
 
+    /**
+     * Get output stream
+     *
+     * @return Output stream
+     */
     public BufferedOutputStream getOutputStream() {
         return FileUtil.getOutputStream(this.physicsFilePath);
     }
 
+    /**
+     * Read string
+     *
+     * @return String
+     */
     public String readString() {
-        return FileUtil.readString(this.getPhysicsFilePath(), CharsetUtil.UTF_8);
+        return FileUtil.readUtf8String(this.getPhysicsFilePath());
     }
 
+    /**
+     * Read lines
+     *
+     * @return List of lines
+     */
     public List<String> readLines() {
         return FileUtil.readLines(this.getPhysicsFilePath(), CharsetUtil.UTF_8);
     }
 
+    /**
+     * Read lines
+     *
+     * @param bytes Bytes
+     */
     public void readLines(byte[] bytes) {
         FileUtil.writeBytes(bytes, CharsetUtil.UTF_8);
     }
 
+    /**
+     * Read lines
+     *
+     * @param list List of lines
+     */
     public void readLines(List<String> list) {
         FileUtil.writeLines(list, this.getPhysicsFilePath(), CharsetUtil.UTF_8);
     }
 
+    /**
+     * Delete file
+     *
+     * @return true if the file is deleted successfully, false otherwise
+     */
     public boolean del() {
         return FileUtil.del(this.getPhysicsFilePath());
     }
 
+    /**
+     * Whether the file exists
+     *
+     * @return true if the file exists, false otherwise
+     */
     public boolean exist() {
         return FileUtil.exist(this.getPhysicsFilePath());
     }
 
+    /**
+     * Create a new file
+     *
+     * @return true if the file is created successfully, false otherwise
+     */
     public boolean createNewFile() throws IOException {
         return toFile().createNewFile();
     }
 
+    /**
+     * Create directory
+     *
+     * @return true if the directory is created successfully, false otherwise
+     */
     public boolean mkdirs() {
         return FileUtil.file(this.getPhysicsFilePath()).mkdirs();
     }
 
+    /**
+     * Whether the directory exists
+     *
+     * @return true if the directory exists, false otherwise
+     */
     public boolean existsDir() {
         return FileUtil.file(this.getPhysicsDirPath()).exists();
     }
 
+    /**
+     * Convert to File
+     */
     public File toFile() {
         return FileUtil.file(this.getPhysicsFilePath());
     }
 
+    /**
+     * Get the user ID of the file creator
+     */
     public String getCreateUserId() {
         return builder.getCreateUserId();
     }
 
+    /**
+     * Whether there is builder input stream data
+     */
     public boolean hasBuilderInputStreamData() {
         return Objects.nonNull(this.builder.getInputStream());
     }
 
+    /**
+     * Write builder input stream data
+     *
+     * @throws IOException
+     */
     public void writeBuilderInputStreamData() throws IOException {
         if (!builder.getCreateDir()) {
             var dir = new File(this.physicsDirPath);
             if (!dir.exists()) {
-                dir.mkdirs();
+                if (!dir.mkdirs()) {
+                    throw new IOException("Directory creation failed");
+                }
+                log.info("Directory created successfully");
             }
         }
         if (!builder.getCreateFile()) {
             var dir = new File(this.physicsFilePath);
             if (!dir.exists()) {
-                dir.createNewFile();
+                if (!dir.createNewFile()) {
+                    throw new IOException("File creation failed");
+                }
+                log.info("File created successfully");
             }
         }
         FileUtil.writeFromStream(this.builder.getInputStream(), FileUtil.file(this.getPhysicsFilePath()));
     }
 
-
+    /**
+     * Open folder by desktop
+     *
+     * @param folderPath Path of the folder to open
+     */
     public static void openFolderByDesktop(String folderPath) {
-
-        // 创建文件夹对象
         File folder = new File(folderPath);
-        // 检查Desktop是否支持打开URL
         if (!Desktop.isDesktopSupported() || !Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-            System.out.println("Desktop 不支持打开文件夹");
+            log.info("Desktop Cannot open folder");
             return;
         }
         Desktop desktop = Desktop.getDesktop();
         try {
             desktop.open(folder);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("open folder error", e);
         }
     }
 
     /**
-     * 根据相对路径地址反推物理路径及加载数据
+     * Derive physical paths and load data based on relative path addresses
      *
-     * @param relativeFilePath
-     * @return
-     * @throws IOException
+     * @param relativeFilePath relative path
+     * @return SimpleFileUtil  instance
      */
     public static SimpleFileUtil loadRelativeFilePath(String relativeFilePath) throws IOException {
         if (StrUtil.isBlank(relativeFilePath)) {
