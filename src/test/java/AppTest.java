@@ -3,19 +3,27 @@ import cn.hutool.core.lang.UUID;
 import cn.hutool.extra.ssh.JschUtil;
 import com.braisefish.jrst.lang.JrstCommonException;
 import com.braisefish.jrst.utils.BuildHelper;
+import com.braisefish.jrst.utils.JsonUtils;
 import com.braisefish.jrst.utils.SimpleFileUtil;
 import com.braisefish.jrst.utils.html.HtmlTagUtil;
 import com.braisefish.jrst.utils.html.HtmlUtil;
 import com.braisefish.jrst.utils.str.DynamicStringBuilder;
 import com.braisefish.jrst.utils.thread.JrstThread;
+import com.braisefish.jrst.utils.verify.code.IVerifyCodeEntry;
+import com.braisefish.jrst.utils.verify.code.VerifyCodeInput;
+import com.braisefish.jrst.utils.verify.code.VerifyCodeOutput;
+import com.braisefish.jrst.utils.verify.code.VerifyCodeUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
 public class AppTest {
-
+    private final static Logger log = LoggerFactory.getLogger(AppTest.class);
     @Test
     public void test() throws IOException {
         HtmlTagUtil htmlTagUtil = new HtmlTagUtil.Builder()
@@ -90,14 +98,14 @@ public class AppTest {
                     System.out.println("线程被中断");
                 }
             }
-        }),(jrstThread)->{
+        }), (jrstThread) -> {
             try {
                 jrstThread.start();
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
                 System.out.println("线程被中断");
-            }finally {
-                if(jrstThread.isAlive()){
+            } finally {
+                if (jrstThread.isAlive()) {
                     jrstThread.stopThread();
                 }
             }
@@ -108,5 +116,43 @@ public class AppTest {
     @Test
     public void jschTest() throws IOException, JrstCommonException {
 
+    }
+
+    @Test
+    public void verifyCodeTest() throws JrstCommonException, JsonProcessingException {
+        VerifyCodeUtil.registerClearExpireVerifyCodeTimer();
+        VerifyCodeInput verifyCodeInput = null;
+        VerifyCodeOutput verifyCodeOutput = null;
+        for (int i = 0; i < 10; i++) {
+            verifyCodeInput = new VerifyCodeInput();
+            verifyCodeInput.setVerifyCodeKey(UUID.randomUUID().toString(true));
+            verifyCodeInput.setCodeCount(4);
+            verifyCodeInput.setHeight(40);
+            verifyCodeInput.setWidth(120);
+            verifyCodeInput.setCircleCount(4);
+
+            verifyCodeOutput = VerifyCodeUtil.createVerifyCode(verifyCodeInput);
+        }
+        verifyCodeInput = new VerifyCodeInput();
+        verifyCodeInput.setVerifyCodeKey(UUID.randomUUID().toString(true));
+        verifyCodeInput.setCodeCount(4);
+        verifyCodeInput.setHeight(40);
+        verifyCodeInput.setWidth(120);
+        verifyCodeInput.setCircleCount(4);
+
+        verifyCodeOutput = VerifyCodeUtil.createVerifyCode(verifyCodeInput);
+        log.info("验证码json:{}", JsonUtils.toJson(verifyCodeOutput));
+        VerifyCodeOutput finalVerifyCodeOutput = verifyCodeOutput;
+        VerifyCodeUtil.verifyCode(new IVerifyCodeEntry() {
+            @Override
+            public String getVerifyCode() {
+                return finalVerifyCodeOutput.getCode();
+            }
+
+            @Override
+            public String getVerifyCodeKey() {
+                return finalVerifyCodeOutput.getUid();
+            }
+        });
     }
 }

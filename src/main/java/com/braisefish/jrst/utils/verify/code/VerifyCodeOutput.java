@@ -1,6 +1,8 @@
 package com.braisefish.jrst.utils.verify.code;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class VerifyCodeOutput {
     public VerifyCodeOutput(String uid, String base64){
         this.uid = uid;
@@ -8,7 +10,16 @@ public class VerifyCodeOutput {
     }
     private String uid;
     private String base64;
+    @JsonIgnore
+    private transient String code;
 
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
 
     public String getUid() {
         return uid;
