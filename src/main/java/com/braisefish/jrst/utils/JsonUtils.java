@@ -10,7 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Map;
 
 public class JsonUtils {
-    private static ObjectMapper OBJECT_MAPPER;
+    private static final ObjectMapper OBJECT_MAPPER;
 
     static {
         OBJECT_MAPPER = new ObjectMapper();

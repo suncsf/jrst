@@ -23,6 +23,10 @@ public class SimpleFileUtil {
      */
     private static String baseDir;
     /**
+     * Base make
+     */
+    private static String baseMake;
+    /**
      * Builder
      */
     private Builder builder;
@@ -78,6 +82,7 @@ public class SimpleFileUtil {
         if (StrUtil.isBlank(baseDir)) {
             throw new IOException("请设置baseDir");
         }
+        SimpleFileUtil.baseDir = baseDir;
         SimpleFileUtil.baseDir = File.separator + baseDir;
     }
 
@@ -399,6 +404,15 @@ public class SimpleFileUtil {
         return getBaseDir() + (StrUtil.startWith(dir, File.separator) ? dir : (File.separator + dir)) + (StrUtil.startWith(appendDir, File.separator) ? appendDir : (File.separator + appendDir));
     }
 
+    public static String loadPhysicsToRelative(String physicsPath) throws IOException {
+        if (!FileUtil.exist(physicsPath)) {
+            return physicsPath;
+        }
+        File file = new File(physicsPath);
+        var filePath = file.getCanonicalPath();
+        return StrUtil.replace(filePath, getBasePhysicsDir(), "");
+    }
+
     public static String loadRelativeDirPathToPhysicsDirPath(String relativeDirPath) {
         if (StrUtil.isBlank(relativeDirPath)) {
             return null;
@@ -417,6 +431,30 @@ public class SimpleFileUtil {
             relativeDirPath = StrUtil.replace(relativeDirPath, getBaseDir(), "");
         }
         return StrUtil.join(getBasePhysicsDir(), relativeDirPath);
+    }
+
+    public static File createTempFile() {
+        return createTempFile(".temp", true);
+    }
+
+    public static File createTempFile(String suffix, boolean isDeleteOnExit) {
+        return createTempFile(suffix, null, isDeleteOnExit);
+    }
+
+    public static File createTempFile(String suffix, String dir, boolean isDeleteOnExit) {
+        return createTempFile(SimpleFileUtil.baseDir + "_", suffix, dir, isDeleteOnExit);
+    }
+
+    public static File createTempFile(String prefix, String suffix, String dir, boolean isDeleteOnExit) {
+        return FileUtil.createTempFile(prefix, suffix, new File(createTempDir(dir)), isDeleteOnExit);
+    }
+
+    public static String createTempDir() {
+        return initPhysicsDir("temp");
+    }
+
+    public static String createTempDir(String dir) {
+        return initPhysicsDir("temp" + (StrUtil.isNotBlank(dir) ? (File.separator + dir) : ""));
     }
 
 

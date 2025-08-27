@@ -13,6 +13,7 @@ import com.braisefish.jrst.utils.verify.code.VerifyCodeInput;
 import com.braisefish.jrst.utils.verify.code.VerifyCodeOutput;
 import com.braisefish.jrst.utils.verify.code.VerifyCodeUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,5 +154,7 @@ public class AppTest {
                 return finalVerifyCodeOutput.getUid();
             }
         });
+        ObjectMapper objectMapper = JsonUtils.getObjectMapper();
+        log.info("验证码json:{}", objectMapper.writeValueAsString(verifyCodeOutput));
     }
 }
