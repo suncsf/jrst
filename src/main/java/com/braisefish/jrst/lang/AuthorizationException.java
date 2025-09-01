@@ -1,6 +1,6 @@
 package com.braisefish.jrst.lang;
 
-public class AuthorizationException extends Exception{
+public class AuthorizationException extends JrstCommonException{
     public AuthorizationException(){
         super();
     }
