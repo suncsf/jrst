@@ -65,12 +65,15 @@ public class OkHttpUtil {
             sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
             final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
             OkHttpClient.Builder okClient = new OkHttpClient.Builder()
-                    .connectionSpecs(Collections.singletonList(ConnectionSpec.COMPATIBLE_TLS))
-                    .sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0])
-                    .hostnameVerifier((hostname, session) -> true)
                     .connectTimeout(2, TimeUnit.MINUTES)
                     .readTimeout(2, TimeUnit.MINUTES);
-            okClient.setHostnameVerifier$okhttp((hostname, session) -> true);
+            if (StrUtil.isNotBlank(this.baseUrl) && !this.baseUrl.startsWith("https://")) {
+                okClient = okClient.connectionSpecs(Collections.singletonList(ConnectionSpec.COMPATIBLE_TLS))
+                        .sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0])
+                        .hostnameVerifier((hostname, session) -> true);
+                okClient.setHostnameVerifier$okhttp((hostname, session) -> true);
+            }
+
 
             if (basic != null) {
                 client = okClient.addInterceptor(new BasicAuthInterceptor(basic.getKey(), basic.getValue()))
@@ -137,13 +140,14 @@ public class OkHttpUtil {
 
     /**
      * POST 传输JSON请求
+     *
      * @param url 请求地址
      * @param t   泛型对象
      * @param <T> 类型
      * @return content结果
      */
     public <T> String post(String url, T t) {
-        try (Response response = postResponse(url, t)){
+        try (Response response = postResponse(url, t)) {
             if (response.body() != null) {
                 return response.body().string();
             }
@@ -162,6 +166,7 @@ public class OkHttpUtil {
     public String post(String url) {
         return post(url, null);
     }
+
     /**
      * POST 默认请求
      *
@@ -201,6 +206,7 @@ public class OkHttpUtil {
         Call call = client.newCall(request);
         return call.execute();
     }
+
     /**
      * 构建者模式
      */
@@ -209,6 +215,7 @@ public class OkHttpUtil {
         private KeyValuePair<String, String> basic;
         private Map<String, String> heads;
         private String baseUrl;
+        private Integer timeout;
 
         public Builder setBaseUrl(String baseUrl) {
             this.baseUrl = baseUrl;
@@ -224,8 +231,19 @@ public class OkHttpUtil {
             this.heads = heads;
             return this;
         }
+
+        public Integer getTimeout() {
+            return timeout;
+        }
+
+        public Builder setTimeout(Integer timeout) {
+            this.timeout = timeout;
+            return this;
+        }
+
         /**
          * 构建
+         *
          * @return OkHttpUtil
          */
         public OkHttpUtil build() {
