@@ -21,7 +21,6 @@ public class KeyValuePair<K, V> implements Comparable<KeyValuePair<K, V>>, Seria
     private V value;
     private DoggyBox<?> doggyBox;
 
-
     private Double sort;
     /**
      * 创建一个只读实例

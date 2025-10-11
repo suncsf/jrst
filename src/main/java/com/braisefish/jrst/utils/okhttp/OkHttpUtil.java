@@ -43,7 +43,11 @@ public class OkHttpUtil {
         KeyValuePair<String, String> basic = builder.basic;
         this.heads = builder.heads;
         this.baseUrl = builder.baseUrl;
-        this.objectMapper = JsonUtils.getObjectMapper();
+        if(Objects.isNull(builder.objectMapper)){
+            this.objectMapper = JsonUtils.getObjectMapper();
+        }else{
+            this.objectMapper = builder.objectMapper;
+        }
         try {
             final TrustManager[] trustAllCerts = new TrustManager[]{
                     new X509TrustManager() {
@@ -61,20 +65,19 @@ public class OkHttpUtil {
                         }
                     }
             };
-            final SSLContext sslContext = SSLContext.getInstance("SSL");
-            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
-            final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+
             OkHttpClient.Builder okClient = new OkHttpClient.Builder()
                     .connectTimeout(2, TimeUnit.MINUTES)
                     .readTimeout(2, TimeUnit.MINUTES);
-            if (StrUtil.isNotBlank(this.baseUrl) && !this.baseUrl.startsWith("https://")) {
+            if (StrUtil.isNotBlank(this.baseUrl) && this.baseUrl.startsWith("https://")) {
+                final SSLContext sslContext = SSLContext.getInstance("SSL");
+                sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+                final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
                 okClient = okClient.connectionSpecs(Collections.singletonList(ConnectionSpec.COMPATIBLE_TLS))
                         .sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0])
                         .hostnameVerifier((hostname, session) -> true);
                 okClient.setHostnameVerifier$okhttp((hostname, session) -> true);
             }
-
-
             if (basic != null) {
                 client = okClient.addInterceptor(new BasicAuthInterceptor(basic.getKey(), basic.getValue()))
                         .build();
@@ -216,6 +219,12 @@ public class OkHttpUtil {
         private Map<String, String> heads;
         private String baseUrl;
         private Integer timeout;
+        private ObjectMapper objectMapper ;
+
+        public Builder setObjectMapper(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+            return this;
+        }
 
         public Builder setBaseUrl(String baseUrl) {
             this.baseUrl = baseUrl;

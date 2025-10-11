@@ -4,10 +4,11 @@ import cn.hutool.core.util.StrUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class HtmlUtil {
-    public final String DEFAULT_TABLE_STYLE = ".sl-show-table{page-break-inside:auto;margin:0 auto;font-size:12px;width:100%;min-height:25px;line-height:25px;text-align:left;border:1px solid#ccc;border-collapse:collapse}.sl-show-table tr{page-break-inside:avoid;page-break-after:auto}.sl-show-table tr th,.sl-show-table tr td{border:1px solid#ccc}.sl-show-table td,.sl-show-table th{text-align:center}.sl-show-table thead{display:table-header-group}.sl-show-table tr td{padding:5px}";
-    public final String DEFAULT_A4_STYLE = "@page a4{size:8.27in 11.69in;margin:.5in.5in.5in.5in;mso-header-margin:.5in;mso-footer-margin:.5in;mso-paper-source:0}div.a4{page:a4}thead{display:table-header-group}tfoot{display:table-row-group}tr{page-break-inside:avoid; page-break-after: auto;}p.page-break-after{page-break-after:always}";
+    public final static String DEFAULT_TABLE_STYLE = ".sl-show-table{page-break-inside:auto;margin:0 auto;font-size:12px;width:100%;min-height:25px;line-height:25px;text-align:left;border:1px solid#ccc;border-collapse:collapse}.sl-show-table tr{page-break-inside:avoid;page-break-after:auto}.sl-show-table tr th,.sl-show-table tr td{border:1px solid#ccc}.sl-show-table td,.sl-show-table th{text-align:center}.sl-show-table thead{display:table-header-group}.sl-show-table tr td{padding:5px}";
+    public final static String DEFAULT_A4_STYLE = "@page a4{size:8.27in 11.69in;margin:.5in.5in.5in.5in;mso-header-margin:.5in;mso-footer-margin:.5in;mso-paper-source:0}div.a4{page:a4}thead{display:table-header-group}tfoot{display:table-row-group}tr{page-break-inside:avoid; page-break-after: auto;}p.page-break-after{page-break-after:always}";
     private Builder builder;
     private HtmlUtil(Builder builder) {
         this.builder = builder;
@@ -28,14 +29,14 @@ public class HtmlUtil {
                 "    <meta charset=\"UTF-8\">\n" +
                 "    <title>" + builder.getTitle() + "</title>\n" +
                 "    <style>\n" +
-                "        " + StrUtil.join("\n", builder.getStyles()) + "\n" +
+                "        " + (Objects.nonNull(builder.getStyles()) ?StrUtil.join("\n", builder.getStyles()):DEFAULT_TABLE_STYLE) + "\n" +
                 "    </style>\n" +
                 "</head>\n" +
                 "<body>\n" +
                 "    " + content + "\n" +
                 "</body>\n" +
                 "    <script>\n" +
-                "        " + StrUtil.join("\n", builder.getScripts()) + "\n" +
+                "        " + (Objects.nonNull(builder.getScripts())?StrUtil.join("\n", builder.getScripts()):"") + "\n" +
                 "    </script>\n" +
                 "</html>";
     }
