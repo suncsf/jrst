@@ -2,6 +2,7 @@ package com.braisefish.jrst.i.entity;
 
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -10,17 +11,20 @@ import java.util.Objects;
  */
 public class DoggyBox<T> {
     public DoggyBox(){}
+    public DoggyBox(T data){
+        this(data,new LinkedHashMap<>());
+    }
     public DoggyBox(T data, Map<String,Object> property){
         this.data = data;
         this.property = property;
     }
 
     public static <T> DoggyBox<T> of(T data){
-        return new DoggyBox<T>(data,new HashMap<>());
+        return new DoggyBox<T>(data,new LinkedHashMap<>());
     }
     public static <T> DoggyBox<T> of(T data,Map<String,Object> property){
         if(Objects.isNull(property)){
-            property = new HashMap<>();
+            property = new LinkedHashMap<>();
         }
         return new DoggyBox<T>(data,property);
     }

@@ -51,7 +51,7 @@ public class KeyValuePair<K, V> implements Comparable<KeyValuePair<K, V>>, Seria
     }
 
     public KeyValuePair(K key, V value, Double sort) {
-        this(key, value, sort, null);
+        this(key, value, sort, new DoggyBox<>());
     }
 
     public KeyValuePair(K key, V value, DoggyBox<?> doggyBox) {
