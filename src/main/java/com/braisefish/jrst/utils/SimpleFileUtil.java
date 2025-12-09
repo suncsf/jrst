@@ -457,6 +457,12 @@ public class SimpleFileUtil {
         return initPhysicsDir("temp" + (StrUtil.isNotBlank(dir) ? (File.separator + dir) : ""));
     }
 
+    public static String combine(String ...paths){
+        if(Objects.isNull(paths)){
+            throw new NullPointerException("paths is null");
+        }
+        return StrUtil.join(File.separator, paths);
+    }
 
     public static class Builder {
         private String dir;

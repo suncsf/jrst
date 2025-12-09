@@ -1,6 +1,5 @@
 package com.braisefish.jrst.i.entity;
 
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -10,28 +9,31 @@ import java.util.Objects;
  * @author 32365
  */
 public class DoggyBox<T> {
-    public DoggyBox(){}
-    public DoggyBox(T data){
-        this(data,new LinkedHashMap<>());
+    public DoggyBox() {
     }
-    public DoggyBox(T data, Map<String,Object> property){
+
+    public DoggyBox(T data) {
+        this(data, new LinkedHashMap<>());
+    }
+
+    public DoggyBox(T data, Map<String, Object> property) {
         this.data = data;
         this.property = property;
     }
 
-    public static <T> DoggyBox<T> of(T data){
-        return new DoggyBox<T>(data,new LinkedHashMap<>());
+    public static <T> DoggyBox<T> of(T data) {
+        return new DoggyBox<T>(data, new LinkedHashMap<>());
     }
-    public static <T> DoggyBox<T> of(T data,Map<String,Object> property){
-        if(Objects.isNull(property)){
+
+    public static <T> DoggyBox<T> of(T data, Map<String, Object> property) {
+        if (Objects.isNull(property)) {
             property = new LinkedHashMap<>();
         }
-        return new DoggyBox<T>(data,property);
+        return new DoggyBox<T>(data, property);
     }
 
-    private Map<String,Object> property;
+    private Map<String, Object> property;
     private T data;
-
 
     public Map<String, Object> getProperty() {
         return property;
