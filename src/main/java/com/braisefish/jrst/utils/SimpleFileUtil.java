@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.*;
+import java.nio.file.FileSystems;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -456,12 +458,22 @@ public class SimpleFileUtil {
     public static String createTempDir(String dir) {
         return initPhysicsDir("temp" + (StrUtil.isNotBlank(dir) ? (File.separator + dir) : ""));
     }
-
-    public static String combine(String ...paths){
-        if(Objects.isNull(paths)){
-            throw new NullPointerException("paths is null");
+    public static String combine(String... paths) {
+        if (paths == null) {
+            throw new IllegalArgumentException("Paths array cannot be null");
         }
-        return StrUtil.join(File.separator, paths);
+
+        String[] components = Arrays.stream(paths)
+                .filter(p -> p != null && !p.isEmpty())
+                .toArray(String[]::new);
+
+        if (components.length == 0) {
+            return "";
+        } else if (components.length == 1) {
+            return components[0];
+        }
+
+        return String.join(File.separator, components);
     }
 
     public static class Builder {

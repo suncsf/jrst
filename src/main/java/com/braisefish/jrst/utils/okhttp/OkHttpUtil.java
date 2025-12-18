@@ -43,9 +43,9 @@ public class OkHttpUtil {
         KeyValuePair<String, String> basic = builder.basic;
         this.heads = builder.heads;
         this.baseUrl = builder.baseUrl;
-        if(Objects.isNull(builder.objectMapper)){
+        if (Objects.isNull(builder.objectMapper)) {
             this.objectMapper = JsonUtils.getObjectMapper();
-        }else{
+        } else {
             this.objectMapper = builder.objectMapper;
         }
         try {
@@ -159,7 +159,24 @@ public class OkHttpUtil {
         }
         return null;
     }
-
+    /**
+     * POST 传输JSON请求
+     *
+     * @param url 请求地址
+     * @param t   泛型对象
+     * @param <T> 类型
+     * @return content结果
+     */
+    public <T> String post(String url, T t, Map<String, String> params) {
+        try (Response response = postResponse(url, t, params)) {
+            if (response.body() != null) {
+                return response.body().string();
+            }
+        } catch (IOException e) {
+            log.error("post error", e);
+        }
+        return null;
+    }
     /**
      * POST 默认请求
      *
@@ -177,7 +194,18 @@ public class OkHttpUtil {
      * @return content结果
      */
     public Response postResponse(String url) throws IOException {
-        return postResponse(url, null);
+        return postResponse(url, null,null);
+    }
+
+    /**
+     * POST 默认请求
+     *
+     * @param url 请求地址
+     * @param data body参数
+     * @return content结果
+     */
+    public <T> Response postResponse(String url, T data) throws IOException {
+        return postResponse(url, data,null);
     }
 
     /**
@@ -188,15 +216,27 @@ public class OkHttpUtil {
      * @param <T> 类型
      * @return content结果
      */
-    public <T> Response postResponse(String url, T t) throws IOException {
+    public <T> Response postResponse(String url, T t, Map<String, String> params) throws IOException {
         Request.Builder builder = new Request.Builder();
         if (heads != null) {
             for (Map.Entry<String, String> item : heads.entrySet()) {
                 builder = builder.addHeader(item.getKey(), item.getValue());
             }
         }
+        StringBuilder sb = new StringBuilder();
+        if (params != null && !params.isEmpty()) {
+            Set<Map.Entry<String, String>> entrySet = params.entrySet();
+            sb.append("?");
+            for (Map.Entry<String, String> entry : entrySet) {
+                sb.append(entry.getKey());
+                sb.append("=");
+                sb.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8));
+                sb.append("&");
+            }
+            sb.deleteCharAt(sb.length() - 1);
+        }
         Request.Builder requestBuilder = builder
-                .url((StrUtil.isBlank(baseUrl) ? "" : baseUrl) + url);
+                .url((StrUtil.isBlank(baseUrl) ? "" : baseUrl) + url + sb);
 
         RequestBody requestBody;
         if (Objects.nonNull(t)) {
@@ -219,7 +259,7 @@ public class OkHttpUtil {
         private Map<String, String> heads;
         private String baseUrl;
         private Integer timeout;
-        private ObjectMapper objectMapper ;
+        private ObjectMapper objectMapper;
 
         public Builder setObjectMapper(ObjectMapper objectMapper) {
             this.objectMapper = objectMapper;
