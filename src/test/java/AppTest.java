@@ -1,11 +1,15 @@
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.UUID;
+import cn.hutool.extra.ssh.JschUtil;
+import cn.hutool.extra.ssh.SshjSftp;
 import com.braisefish.jrst.lang.JrstCommonException;
 import com.braisefish.jrst.utils.BuildHelper;
 import com.braisefish.jrst.utils.JsonUtils;
 import com.braisefish.jrst.utils.SimpleFileUtil;
 import com.braisefish.jrst.utils.html.HtmlTagUtil;
 import com.braisefish.jrst.utils.html.HtmlUtil;
+import com.braisefish.jrst.utils.jsch.JschShellUtil;
 import com.braisefish.jrst.utils.str.DynamicStringBuilder;
 import com.braisefish.jrst.utils.thread.JrstThread;
 import com.braisefish.jrst.utils.verify.code.IVerifyCodeEntry;
@@ -14,6 +18,7 @@ import com.braisefish.jrst.utils.verify.code.VerifyCodeOutput;
 import com.braisefish.jrst.utils.verify.code.VerifyCodeUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jcraft.jsch.JSchException;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,9 +26,12 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class AppTest {
     private final static Logger log = LoggerFactory.getLogger(AppTest.class);
+
     @Test
     public void test() throws IOException {
         HtmlTagUtil htmlTagUtil = new HtmlTagUtil.Builder()
@@ -156,5 +164,31 @@ public class AppTest {
         });
         ObjectMapper objectMapper = JsonUtils.getObjectMapper();
         log.info("验证码json:{}", objectMapper.writeValueAsString(verifyCodeOutput));
+    }
+
+    @Test
+    public void sshTest() throws Exception {
+//        var session = JschUtil.createSession("192.168.56.104", 22, "sysadm", "goldwind@32365");
+//        JschShellUtil jschShellUtil = new JschShellUtil.Builder()
+//                .setSession(session)
+//                .build();
+//        var text = jschShellUtil.executeAndReadText("cd /");
+//        log.info("text:{}", text);
+//        text = jschShellUtil.executeAndReadText("ls");
+//        log.info("text:{}", text);
+//        text = jschShellUtil.executeAndReadText("cd /etc");
+//        text = jschShellUtil.executeAndReadText("pwd");
+//        log.info("text:{}", text);
+
+
+        JschShellUtil jschShellUtil = new JschShellUtil.Builder()
+                .setSession(JschUtil.createSession("192.168.56.101", 22, "sysadm", "goldwind@32365"))
+                .build();
+        var lines =    jschShellUtil.readOriginalOutput();
+        log.info("lines:{}", lines);
+         lines =  jschShellUtil.executeAndRead("cd /tmp");
+        log.info("lines:{}", lines);
+         lines = jschShellUtil.executeAndRead("find /tmp -maxdepth 1 -type f -size 0 -delete");
+        log.info("lines:{}", lines);
     }
 }

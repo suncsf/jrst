@@ -2,15 +2,22 @@ package com.braisefish.jrst.lang;
 
 public class JrstCommonException extends Exception {
     private Integer code = 0;
-    public JrstCommonException(){
+
+    public JrstCommonException() {
         super("通用异常抛出");
     }
-    public JrstCommonException(String message){
+
+    public JrstCommonException(String message) {
         super(message);
     }
-    public JrstCommonException(Integer code, String message){
+
+    public JrstCommonException(Integer code, String message) {
         this(message);
         this.code = code;
+    }
+
+    public JrstCommonException(Throwable cause) {
+        super(cause);
     }
 
     public Integer getCode() {
