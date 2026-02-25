@@ -9,6 +9,7 @@ import com.braisefish.jrst.utils.JsonUtils;
 import com.braisefish.jrst.utils.SimpleFileUtil;
 import com.braisefish.jrst.utils.html.HtmlTagUtil;
 import com.braisefish.jrst.utils.html.HtmlUtil;
+import com.braisefish.jrst.utils.jsch.JschShellTerminal2;
 import com.braisefish.jrst.utils.jsch.JschShellUtil;
 import com.braisefish.jrst.utils.str.DynamicStringBuilder;
 import com.braisefish.jrst.utils.thread.JrstThread;
@@ -190,5 +191,17 @@ public class AppTest {
         log.info("lines:{}", lines);
          lines = jschShellUtil.executeAndRead("find /tmp -maxdepth 1 -type f -size 0 -delete");
         log.info("lines:{}", lines);
+
+
+    }
+    @Test
+    public void jschTest2() throws Exception {
+        JschShellTerminal2 jschShellTerminal2 = new JschShellTerminal2.Builder()
+                .setSession(JschUtil.createSession("192.168.56.102", 22, "sysadm", "goldwind@32365"))
+                .build();
+        jschShellTerminal2.command("cd /tmp", "cd_cmd_id");
+        jschShellTerminal2.command("pwd", "21312");
+        log.info("---------");
+        Thread.sleep(100000);
     }
 }
