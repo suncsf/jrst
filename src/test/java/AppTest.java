@@ -9,6 +9,7 @@ import com.braisefish.jrst.utils.JsonUtils;
 import com.braisefish.jrst.utils.SimpleFileUtil;
 import com.braisefish.jrst.utils.html.HtmlTagUtil;
 import com.braisefish.jrst.utils.html.HtmlUtil;
+import com.braisefish.jrst.utils.jsch.JschShellTerminal;
 import com.braisefish.jrst.utils.jsch.JschShellTerminal2;
 import com.braisefish.jrst.utils.jsch.JschShellUtil;
 import com.braisefish.jrst.utils.str.DynamicStringBuilder;
@@ -183,9 +184,13 @@ public class AppTest {
 
 
         JschShellUtil jschShellUtil = new JschShellUtil.Builder()
-                .setSession(JschUtil.createSession("192.168.56.101", 22, "sysadm", "goldwind@32365"))
+                .setSession(JschUtil.createSession("192.168.56.102", 22, "sysadm", "goldwind@32365"))
                 .build();
         var lines =    jschShellUtil.readOriginalOutput();
+        log.info("lines:{}", lines);
+      jschShellUtil.execute("sudo su root");
+        log.info("lines:{}", lines);
+        lines =  jschShellUtil.executeAndRead("goldwind@32365");
         log.info("lines:{}", lines);
          lines =  jschShellUtil.executeAndRead("cd /tmp");
         log.info("lines:{}", lines);
@@ -196,11 +201,11 @@ public class AppTest {
     }
     @Test
     public void jschTest2() throws Exception {
-        JschShellTerminal2 jschShellTerminal2 = new JschShellTerminal2.Builder()
+        JschShellTerminal jschShellTerminal = new JschShellTerminal.Builder()
                 .setSession(JschUtil.createSession("192.168.56.102", 22, "sysadm", "goldwind@32365"))
                 .build();
-        jschShellTerminal2.command("cd /tmp", "cd_cmd_id");
-        jschShellTerminal2.command("pwd", "21312");
+        jschShellTerminal.command("cd /tmp", "cd_cmd_id");
+        jschShellTerminal.command("pwd", "21312");
         log.info("---------");
         Thread.sleep(100000);
     }
